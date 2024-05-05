@@ -17,7 +17,7 @@ javafx {
 
 application {
     mainModule = "com.raven.microforge"
-    mainClass = "com.raven.microforge.MyApplication"
+    mainClass = "com.raven.microforge.main"
 }
 
 dependencies {
