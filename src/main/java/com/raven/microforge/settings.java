@@ -1,4 +1,3 @@
-
 package com.raven.microforge;
 
 import javafx.event.ActionEvent;
@@ -50,16 +49,19 @@ public class settings{
     }
     private static Node createButtonBox() {
         okButton = new Button(ok);
+        okButton.getStyleClass().add("settingsButton");
         return null;
     }
     private static Node createChoiceBox(){
         langChoice = new ChoiceBox();
         langChoice.getItems().addAll("English","Deutsch","Esp\u00f1ol","Lingua latina", "Nederlands");
+        langChoice.getStyleClass().add("settingsChoiceBox");
         langChoice.setValue("English");
         return null;
     }
     private static Node createCheckBox(){
         initialCode = new CheckBox();
+        initialCode.getStyleClass().add("settingsCheckBox");
         initialCode.setText(initialCodeString);
         initialCode.setSelected(true);
         return null;

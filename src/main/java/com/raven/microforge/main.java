@@ -9,7 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.stage.*;
 import org.slf4j.*;
-
+import org.fxmisc.richtext.*;
 import java.io.*;
 import java.util.concurrent.ExecutionException;
 
@@ -24,20 +24,22 @@ public class main extends Application {
     public String openButtonText="Open";
 
     public String textAreaText="/*Welcome to Microforge\n" +
-            "version =" +version+"*/\n" +
+            "version = " +version+"*/\n" +
             "void setup(){\n" +
             "//input code here to run once\n" +
             "}\n" +
             "void loop(){\n" +
             "//input code here to run over and over again forever\n" +
             "}";
-
+    public String theme = "dark.css";
     public Boolean initialText = true;
-    private Button saveButton;
-    private Button openButton;
-    private Button settingsButton;
-    private TextArea textArea;
     private TextArea terminal;
+    private CodeArea mainCodeArea;
+    private MenuItem openItem;
+    private MenuItem saveItem;
+    private MenuItem settingsItem;
+    private MenuButton menuBar;
+
 
     @Override
     public void start(Stage primaryStage) {
@@ -46,25 +48,25 @@ public class main extends Application {
         borderPane.setBottom(createButtonBox());
         borderPane.setTop(createMenuAreaBox());
 
-
         Scene scene = new Scene(borderPane);
+        scene.getStylesheets().add(getClass().getResource("/themes/"+theme).toExternalForm());
         primaryStage.getIcons().add(new Image(main.class.getResourceAsStream("/textures/icon.png")));
         primaryStage.setTitle(name);
         primaryStage.setScene(scene);
         primaryStage.setMaximized(true);
         primaryStage.show();
 
-        saveButton.setOnAction((ActionEvent event) -> {
+        saveItem.setOnAction((ActionEvent event) -> {
             FileChooser fileChooser = new FileChooser();
             FileChooser.ExtensionFilter extFilter =
                     new FileChooser.ExtensionFilter("Microcontroller sketch (*.ino)", "*.ino");
             fileChooser.getExtensionFilters().add(extFilter);
             File file = fileChooser.showSaveDialog(primaryStage);
             if(file != null){
-                SaveFile(textArea.getText(), file);
+                SaveFile(mainCodeArea.getText(), file);
             }
         });
-        openButton.setOnAction((ActionEvent event) -> {
+        openItem.setOnAction((ActionEvent event) -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().add(
                     new FileChooser.ExtensionFilter("Microcontroller sketches (*.ino)", "*.ino")
@@ -76,59 +78,52 @@ public class main extends Application {
             }
 
         });
-        settingsButton.setOnAction(e -> settings.display());
+       settingsItem.setOnAction(event -> {settings.display();});
     }
 
     private Node createButtonBox() {
-        saveButton = new Button(saveButtonText);
-        openButton = new Button(openButtonText);
-        settingsButton = new Button(settingsButtonText);
+
 
         return null;
     }
 
     private Node createMenuAreaBox() {
-        CustomMenuItem openButtonItem = new CustomMenuItem();
-        openButtonItem.setContent(openButton);
-        openButtonItem.setHideOnClick(false);
-        CustomMenuItem saveButtonItem = new CustomMenuItem();
-        saveButtonItem.setContent(saveButton);
-        saveButtonItem.setHideOnClick(false);
-        CustomMenuItem settingsButtonItem = new CustomMenuItem();
-        settingsButtonItem.setContent(settingsButton);
-        settingsButtonItem.setHideOnClick(false);
-
-        Menu fileMenu = new Menu();
-        fileMenu.getItems().addAll(saveButtonItem, openButtonItem, settingsButtonItem);
-        fileMenu.setText(fileMenuName);
-        MenuBar menuBar = new MenuBar();
-        menuBar.getMenus().addAll(fileMenu);
-
+        openItem = new MenuItem(openButtonText);
+        saveItem = new MenuItem(saveButtonText);
+        settingsItem = new MenuItem(settingsButtonText);
+        menuBar = new MenuButton();
+        menuBar.setText(fileMenuName);
+        menuBar.getItems().addAll(saveItem,openItem,settingsItem);
+        menuBar.getStyleClass().add("menuBar");
         VBox vBox = new VBox();
         vBox.getChildren().add(menuBar);
+        vBox.getStyleClass().add("topMenuBar");
         return (vBox);
     };
     private Node createTextAreaBox() {
-        textArea = new TextArea();
+        mainCodeArea = new CodeArea();
+        mainCodeArea.setId("mainCodeArea");
         if(initialText){
-            textArea.setText(textAreaText);
+            mainCodeArea.replaceText(textAreaText);
         }
         else{
-            textArea.setText("");
+            mainCodeArea.replaceText("");
         }
         terminal = new TextArea(terminalText);
+        terminal.getStyleClass().add("terminalTextArea");
         terminal.setEditable(false);
         ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setContent(textArea);
+        scrollPane.setContent(mainCodeArea);
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
+        scrollPane.setId("scrollPane");
         return scrollPane;
     }
     private void SaveFile(String content, File file){
         try {
 
             FileWriter fileWriter;
-            content = textArea.getText() ;
+            content = mainCodeArea.getText() ;
             fileWriter = new FileWriter(file);
             fileWriter.write(content);
             fileWriter.close();
@@ -154,7 +149,7 @@ public class main extends Application {
         };
         loadFileTask.setOnSucceeded(workerStateEvent -> {
             try {
-                textArea.setText(loadFileTask.get());
+                mainCodeArea.replaceText(loadFileTask.get());
             } catch (InterruptedException | ExecutionException e) {
                 terminal.setText(couldNotLoad);
             }

@@ -1,0 +1,45 @@
+#mainCodeArea{
+-fx-background-color:#ffffff;
+-fx-font-size:15;
+-fx-border:none;
+}
+#mainCodeArea .text{
+ -fx-fill:#4f5659;
+}
+
+.terminalTextArea{
+    -fx-background-color:rgb(10,10,10);
+    -fx-color:rgb(156, 0, 0);
+}
+.menuBar .label{
+-fx-text-fill: #ffffff;
+}
+.menuBar, .menuBar .menu-item, .menuBar .context-menu {
+    -fx-background-color:#00878F;
+}
+.menuBar .menu-item:hover {
+    -fx-background-color: #62AEB2 ;
+}
+.menuBar .menu-item .label {
+    -fx-text-fill: #ffffff;
+}
+.menuBar .arrow-button{
+    -fx-padding: 0;
+}
+.menuBar .arrow-button .arrow{
+   -fx-padding: 0;
+}
+.topMenuBar{
+-fx-background-color:#00878F;
+}
+#scrollPane{
+    -fx-background-color:transparent;
+     -fx-background-insets: 0;
+     -fx-padding: 0;
+}
+#scrollPane:focused{
+    -fx-background-insets: 0;
+    }
+#scrollPane .corner{
+    -fx-background-insets: 0;
+}
