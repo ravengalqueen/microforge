@@ -43,3 +43,7 @@
 #scrollPane .corner{
     -fx-background-insets: 0;
 }
+.main-code-area .lineno{
+-fx-background-color:#ffffff;
+-fx-fill:#4f5659;
+}

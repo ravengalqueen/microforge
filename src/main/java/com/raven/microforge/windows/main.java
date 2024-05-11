@@ -1,4 +1,4 @@
-package com.raven.microforge;
+package com.raven.microforge.windows;
 
 import javafx.application.*;
 import javafx.concurrent.Task;
@@ -31,7 +31,7 @@ public class main extends Application {
             "void loop(){\n" +
             "//input code here to run over and over again forever\n" +
             "}";
-    public String theme = "dark.css";
+    public String theme = "light.css";
     public Boolean initialText = true;
     private TextArea terminal;
     private CodeArea mainCodeArea;
@@ -78,7 +78,8 @@ public class main extends Application {
             }
 
         });
-       settingsItem.setOnAction(event -> {settings.display();});
+       settingsItem.setOnAction(event -> {
+           settings.display();});
     }
 
     private Node createButtonBox() {
@@ -102,7 +103,9 @@ public class main extends Application {
     };
     private Node createTextAreaBox() {
         mainCodeArea = new CodeArea();
+        mainCodeArea.getStyleClass().add("main-code-area");
         mainCodeArea.setId("mainCodeArea");
+        mainCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(mainCodeArea));
         if(initialText){
             mainCodeArea.replaceText(textAreaText);
         }
