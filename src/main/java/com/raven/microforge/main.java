@@ -1,6 +1,8 @@
-package com.raven.microforge.windows;
+package com.raven.microforge;
 
 import javafx.application.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.*;
 import javafx.geometry.Pos;
@@ -16,6 +18,8 @@ import java.util.concurrent.ExecutionException;
 
 public class main extends Application {
     private final static Logger logger = LoggerFactory.getLogger(main.class);
+    private int i = 0;
+
     public String name ="Microforge";
     public String fileMenuName="File";
     public String version = "preAlpha";
@@ -23,6 +27,9 @@ public class main extends Application {
     public String saveButtonText="save";
     public String settingsButtonText="Settings";
     public String openButtonText="Open";
+    private String leaveButtonText="Leave Anyways";
+    private String saveLeaveButtonText="Save before leaving";
+    private String returnButtonText="Return to Microforge";
 
     public String textAreaText="/*Welcome to Microforge\n" +
             "version = " +version+"*/\n" +
@@ -33,14 +40,19 @@ public class main extends Application {
             "//input code here to run over and over again forever\n" +
             "}";
     private String theme = "dark.css";
+    private String leaveString = "Are you sure you want to leave?";
     public Boolean initialText = true;
+    private Boolean hasChanged = false;
     private TextArea terminal;
     private CodeArea mainCodeArea;
     private MenuItem openItem;
     private MenuItem saveItem;
     private MenuItem settingsItem;
     private MenuButton menuBar;
-    private static Button okButton;
+    private Button okButton;
+    private Button leaveButton;
+    private Button saveLeaveButton;
+    private Button returnButton;
     private static CheckBox initialCode;
     private static ChoiceBox langChoice;
     public static String initialCodeString="initial code";
@@ -58,6 +70,48 @@ public class main extends Application {
         primaryStage.setScene(scene);
         primaryStage.setMaximized(true);
         primaryStage.show();
+        Platform.setImplicitExit(false);
+        primaryStage.setOnCloseRequest( event -> {
+                if(hasChanged == true){
+                    System.out.println("succesful");
+                    BorderPane leavePane = new BorderPane();
+                    leavePane.setBottom(createButtonBox());
+                    Stage leaveDialog = new Stage();
+                    leaveDialog.setResizable(false);
+                    leaveDialog.initStyle(StageStyle.UNDECORATED);
+                    leaveDialog.initModality(Modality.APPLICATION_MODAL);
+                    leaveDialog.initOwner(primaryStage);
+                    HBox idkHBox = new HBox(30);
+                    idkHBox.setAlignment(Pos.CENTER);
+                    idkHBox.getChildren().addAll(saveLeaveButton, returnButton, leaveButton);
+                    Label leaveLabel = new Label(leaveString);
+                    VBox idkBox = new VBox(20);
+                    idkBox.setAlignment(Pos.CENTER);
+                    idkBox.getChildren().addAll(leaveLabel, idkHBox);
+                  Scene leaveScene = new Scene(idkBox, 450,200);
+                  leaveDialog.setScene(leaveScene);
+                    leaveButton.setOnAction((leaveEvent)->
+                            primaryStage.close()
+                    );
+                    returnButton.setOnAction((returnEvent)->{
+                        event.consume();
+                        leaveDialog.hide();
+                });
+                    saveLeaveButton.setOnAction((saveBeforeEvent)-> {
+                        FileChooser fileChooser = new FileChooser();
+                        FileChooser.ExtensionFilter extFilter =
+                                new FileChooser.ExtensionFilter("Microcontroller sketch (*.ino)", "*.ino");
+                        fileChooser.getExtensionFilters().add(extFilter);
+                        File file = fileChooser.showSaveDialog(primaryStage);
+                        if(file != null){
+                            SaveFile(mainCodeArea.getText(), file);
+                        }
+                        primaryStage.close();
+                    });
+                  leaveDialog.showAndWait();
+                }
+
+        });
 
         saveItem.setOnAction((ActionEvent event) -> {
             FileChooser fileChooser = new FileChooser();
@@ -92,6 +146,7 @@ public class main extends Application {
            Stage dialog = new Stage();
            dialog.setTitle("Settings");
            dialog.initModality(Modality.APPLICATION_MODAL);
+           dialog.initStyle(StageStyle.UNDECORATED);
            dialog.setResizable(false);
            dialog.initOwner(primaryStage);
            okButton.setOnAction((ActionEvent okevent) -> {
@@ -126,6 +181,15 @@ public class main extends Application {
         mainCodeArea = new CodeArea();
         mainCodeArea.getStyleClass().add("main-code-area");
         mainCodeArea.setId("mainCodeArea");
+        mainCodeArea.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                i = i+1;
+                if(i != 1){
+                hasChanged=true;}
+                System.out.println("change");
+            }
+        });
         mainCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(mainCodeArea));
         if(initialText){
             mainCodeArea.replaceText(textAreaText);
@@ -146,7 +210,14 @@ public class main extends Application {
     private Node createButtonBox() {
         okButton = new Button("ok");
         okButton.getStyleClass().add("settingsButton");
-        return okButton;
+        saveLeaveButton = new Button(saveLeaveButtonText);
+        saveLeaveButton.getStyleClass().add("leaveButton");
+        returnButton = new Button(returnButtonText);
+        returnButton.getStyleClass().add("leaveButton");
+        leaveButton = new Button(leaveButtonText);
+        leaveButton.getStyleClass().add("leaveButton");
+        //return ;
+        return null;
     }
     private static Node createChoiceBox(){
         langChoice = new ChoiceBox();

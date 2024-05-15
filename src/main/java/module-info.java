@@ -3,5 +3,5 @@ module com.raven.microforge.windows {
     requires org.slf4j;
     requires org.fxmisc.richtext;
 
-    exports com.raven.microforge.windows;
+    exports com.raven.microforge;
 }
