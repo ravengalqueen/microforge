@@ -3,6 +3,7 @@ package com.raven.microforge.windows;
 import javafx.application.*;
 import javafx.concurrent.Task;
 import javafx.event.*;
+import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -31,7 +32,7 @@ public class main extends Application {
             "void loop(){\n" +
             "//input code here to run over and over again forever\n" +
             "}";
-    public String theme = "light.css";
+    private String theme = "dark.css";
     public Boolean initialText = true;
     private TextArea terminal;
     private CodeArea mainCodeArea;
@@ -39,13 +40,15 @@ public class main extends Application {
     private MenuItem saveItem;
     private MenuItem settingsItem;
     private MenuButton menuBar;
-
+    private static Button okButton;
+    private static CheckBox initialCode;
+    private static ChoiceBox langChoice;
+    public static String initialCodeString="initial code";
 
     @Override
     public void start(Stage primaryStage) {
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(createTextAreaBox());
-        borderPane.setBottom(createButtonBox());
         borderPane.setTop(createMenuAreaBox());
 
         Scene scene = new Scene(borderPane);
@@ -78,15 +81,33 @@ public class main extends Application {
             }
 
         });
+
+
+
        settingsItem.setOnAction(event -> {
-           settings.display();});
+           BorderPane settingsPane = new BorderPane();
+           settingsPane.setBottom(createButtonBox());
+           settingsPane.setBottom(createCheckBox());
+           settingsPane.setBottom(createChoiceBox());
+           Stage dialog = new Stage();
+           dialog.setTitle("Settings");
+           dialog.initModality(Modality.APPLICATION_MODAL);
+           dialog.setResizable(false);
+           dialog.initOwner(primaryStage);
+           okButton.setOnAction((ActionEvent okevent) -> {
+               initialCode.setSelected(initialCode.isSelected());
+               dialog.close();
+           });
+           VBox dialogVbox = new VBox(20);
+           dialogVbox.setAlignment(Pos.CENTER);
+           dialogVbox.getChildren().addAll(langChoice,initialCode, okButton);
+           Scene dialogScene = new Scene(dialogVbox, 300, 200);
+           dialogScene.getStylesheets().add(getClass().getResource("/themes/"+theme).toExternalForm());
+           dialog.setScene(dialogScene);
+           dialog.showAndWait();
+       });
     }
 
-    private Node createButtonBox() {
-
-
-        return null;
-    }
 
     private Node createMenuAreaBox() {
         openItem = new MenuItem(openButtonText);
@@ -121,6 +142,25 @@ public class main extends Application {
         scrollPane.setFitToWidth(true);
         scrollPane.setId("scrollPane");
         return scrollPane;
+    }
+    private Node createButtonBox() {
+        okButton = new Button("ok");
+        okButton.getStyleClass().add("settingsButton");
+        return okButton;
+    }
+    private static Node createChoiceBox(){
+        langChoice = new ChoiceBox();
+        langChoice.getItems().addAll("English","Deutsch","Esp\u00f1ol","Lingua latina", "Nederlands");
+        langChoice.getStyleClass().add("settingsChoiceBox");
+        langChoice.setValue("English");
+        return langChoice;
+    }
+    private static Node createCheckBox(){
+        initialCode = new CheckBox();
+        initialCode.getStyleClass().add("settingsCheckBox");
+        initialCode.setText(initialCodeString);
+        initialCode.setSelected(true);
+        return initialCode;
     }
     private void SaveFile(String content, File file){
         try {
@@ -177,6 +217,7 @@ public class main extends Application {
             loadFileToTextArea(fileToLoad);
         }
     }
+
     public static void main(String[] args) {
         launch(args);
     }
