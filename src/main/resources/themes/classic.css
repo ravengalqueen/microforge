@@ -1,3 +1,7 @@
+.root{
+-fx-background-color:#e8e8e8;
+-fx-font-size:13;
+}
 #mainCodeArea{
 -fx-background-color:#ffffff;
 -fx-font-size:15;
@@ -5,6 +9,35 @@
 }
 #mainCodeArea .text{
  -fx-fill:#4f5659;
+}
+.settingsButton{
+-fx-text-fill:#ffffff;
+-fx-background-color:#00878F;
+}
+.settingsButton:hover{
+-fx-background-color: #62AEB2;
+-fx-cursor:hand;
+}
+.leaveButton{
+-fx-text-fill:#ffffff;
+-fx-background-color:#00878F;
+}
+.leaveButton:hover{
+-fx-background-color: #62AEB2;
+-fx-cursor:hand;
+}
+.labelC{
+-fx-font-size:17;
+-fx-text-fill:#4f5659;
+}
+#returnButton{
+-fx-background-color:#E47128;
+-fx-border-color:#a34e18;
+-fx-border-width:2px;
+}
+#returnButton:hover{
+-fx-background-color:#cc6423;
+-fx-border-width:2px;
 }
 
 .terminalTextArea{
@@ -16,9 +49,11 @@
 }
 .menuBar, .menuBar .menu-item, .menuBar .context-menu {
     -fx-background-color:#00878F;
+        -fx-cursor:hand;
 }
 .menuBar .menu-item:hover {
     -fx-background-color: #62AEB2 ;
+        -fx-cursor:hand;
 }
 .menuBar .menu-item .label {
     -fx-text-fill: #ffffff;
