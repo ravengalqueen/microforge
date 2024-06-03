@@ -1,3 +1,8 @@
+/*@font-face{
+ font-family: "miracode";
+  src:url("src/main/resources/fonts/Miracode.ttf");
+}*/
+
 .root{
 -fx-background-color:#212020;
 -fx-font-size:13;
@@ -30,12 +35,12 @@
 -fx-font-size:17;
 -fx-text-fill:#e8e3e3;
 }
-#returnButton{
+.returnButton{
 -fx-background-color:#014028;
 -fx-border-color:#001c11;
 -fx-border-width:2px;
 }
-#returnButton:hover{
+.returnButton:hover{
 -fx-background-color:#01613c;
 -fx-border-color:#001c11;
 -fx-border-width:2px;
@@ -43,6 +48,10 @@
 .terminalTextArea{
     -fx-background-color:rgb(10,10,10);
     -fx-color:rgb(156, 0, 0);
+}
+.menuBar:hover {
+    -fx-background-color: #202220 ;
+    -fx-cursor:hand;
 }
 .menuBar .label{
 -fx-text-fill: #ffffff;

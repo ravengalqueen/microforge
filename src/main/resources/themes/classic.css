@@ -30,12 +30,12 @@
 -fx-font-size:17;
 -fx-text-fill:#4f5659;
 }
-#returnButton{
+.returnButton{
 -fx-background-color:#E47128;
 -fx-border-color:#a34e18;
 -fx-border-width:2px;
 }
-#returnButton:hover{
+.returnButton:hover{
 -fx-background-color:#cc6423;
 -fx-border-width:2px;
 }
