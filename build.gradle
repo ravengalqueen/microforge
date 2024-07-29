@@ -26,6 +26,7 @@ dependencies {
     implementation "org.fxmisc.richtext:richtextfx:0.11.2"
     implementation "com.dlsc.preferencesfx:preferencesfx-core:11.17.0"
     implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'org.reactfx:reactfx:2.0-M%'
 }
 
 jlink {

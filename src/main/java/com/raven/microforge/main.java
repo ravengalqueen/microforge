@@ -18,19 +18,28 @@ import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.*;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
+//import org.reactfx.Subscription;
 import org.slf4j.*;
 import org.fxmisc.richtext.*;
+
 import java.io.*;
+import java.lang.reflect.Array;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 public class main extends Application {
     private final static Logger logger = LoggerFactory.getLogger(main.class);
@@ -38,7 +47,7 @@ public class main extends Application {
 
     private String name = "Microforge";
     private String fileMenuName = "File";
-    private String version = "preAlpha";
+    private String version = "preAlpha 0.0.1";
     private String newFileButtonString = "Ignore";
     private String newSaveString = "Save";
     private String newReturnButtons = "Return";
@@ -53,10 +62,10 @@ public class main extends Application {
     private String textAreaText = "/*Welcome to Microforge\n" +
             "version = " + version + "*/\n" +
             "void setup(){\n" +
-            "//input code here to run once\n" +
+            "  //input code here to run once\n" +
             "}\n" +
             "void loop(){\n" +
-            "//input code here to run over and over again forever\n" +
+            "  //input code here to run over and over again forever\n" +
             "}";
     private String theme = "dark.css";
     private String leaveString = "Are you sure you want to leave?\n" +
@@ -64,7 +73,6 @@ public class main extends Application {
     private String newFileString = "Are you sure you want to make a new File?\n" +
             "you have unsaved changes";
     BooleanProperty iC = new SimpleBooleanProperty(true);
-
     private Boolean hasSaved = false;
     private Boolean hasChanged = false;
     private Boolean settingsOpen = false;
@@ -85,17 +93,19 @@ public class main extends Application {
     private static ChoiceBox langChoice;
     private static ChoiceBox themeChoice;
     private static ChoiceBox fontChoice;
+    IntegerProperty fontsize = new SimpleIntegerProperty(13);
     private static String initialCodeString = "initial code";
-    static File themes = new File("src/main/resources/themes");
-    static File[] listOfThemes = themes.listFiles();
+     File themes = new File("src/main/resources/themes");
+     File[] listOfThemes = themes.listFiles();
 
-    static File fonts = new File("src/main/resources/fonts");
-    static File[] listOfFonts = fonts.listFiles();
+     File fonts = new File("src/main/resources/fonts");
+     File[] listOfFonts = fonts.listFiles();
+
+     private String font = "Miracode";
     ObservableList themeItems;
 
     @Override
     public void start(Stage primaryStage) {
-        Font.loadFont(getClass().getResourceAsStream("src/main/resources/fonts/Miracode.ttf"), 20);
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(createTextAreaBox());
         borderPane.setTop(createMenuAreaBox());
@@ -164,7 +174,7 @@ public class main extends Application {
             if (file != null) {
                 SaveFile(mainCodeArea.getText(), file);
             }
-            hasSaved=true;
+            hasSaved = true;
         });
         openItem.setOnAction((ActionEvent event) -> {
             FileChooser fileChooser = new FileChooser();
@@ -240,32 +250,22 @@ public class main extends Application {
     }
 
     public void preferencesFx() {
-
-
-        ObjectProperty font = new SimpleObjectProperty<>("src/main/resources/fonts/Miracode.ttf");
         ObservableList fontItems = FXCollections.observableArrayList(Arrays.asList(listOfFonts));
-          for(int i = 0; i > listOfFonts.length; i++){
-            fontItems.add(listOfFonts[i].getName());
-        }
+        ObjectProperty font = new SimpleObjectProperty<>(listOfFonts[0]);
 
-           themeItems = FXCollections.observableArrayList(Arrays.asList());
-        for(int i = 0; i > listOfFonts.length; i++){
-            themeItems.add(listOfThemes[i].getName());
-        }
-          ObjectProperty theme = new SimpleObjectProperty<>("dark.css");
-
-        IntegerProperty integerProperty = new SimpleIntegerProperty(12);
-        DoubleProperty doubleProperty = new SimpleDoubleProperty(6.5);
+        themeItems = FXCollections.observableArrayList(Arrays.asList(listOfThemes));
+        ObjectProperty theme = new SimpleObjectProperty<>(listOfThemes[0]);
         PreferencesFx preferencesFx =
                 PreferencesFx.of(main.class,
                         Category.of("Main",
                                 Setting.of("Initial Code", iC),
-                                Setting.of("Font",fontItems, font),
-                                Setting.of("Theme",themeItems, theme)
+                                Setting.of("Font", fontItems, font),
+                                Setting.of("Theme", themeItems, theme),
+                                Setting.of("Font size", fontsize, 2, 40)
                         )
                 );
-       preferencesFx.buttonsVisibility(false);
-         settingsOpen=true;
+        preferencesFx.buttonsVisibility(false);
+        settingsOpen = true;
         preferencesFx.dialogTitle("settings");
         preferencesFx.persistWindowState(true);
         preferencesFx.persistApplicationState(true);
@@ -283,27 +283,26 @@ public class main extends Application {
         settingsItem = new MenuItem(settingsButtonText);
         menuBar = new MenuButton();
         menuBar.setText(fileMenuName);
-        menuBar.getItems().addAll(saveItem, openItem,newItem, settingsItem);
+        menuBar.getItems().addAll(saveItem, openItem, newItem, settingsItem);
         menuBar.getStyleClass().add("menuBar");
         VBox vBox = new VBox();
         vBox.getChildren().add(menuBar);
         vBox.getStyleClass().add("topMenuBar");
         return (vBox);
     }
+
     private static StyleSpans<Collection<String>> computeHighlighting(String text) {
         StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
-      //  spansBuilder.add(List.of("red-text"), text.length() / 2);
-       // spansBuilder.add(List.of("red-text"), text.length() / 2);
         return spansBuilder.create();
     }
+
     private Node createTextAreaBox() {
         mainCodeArea = new CodeArea();
         mainCodeArea.getStyleClass().add("main-code-area");
         mainCodeArea.setId("mainCodeArea");
-       /* mainCodeArea.textProperty().addListener((obs, oldText, newText) -> {
-            mainCodeArea.setStyleSpans(0, computeHighlighting(mainCodeArea.getText()));
-        });*/
-        //mainCodeArea.setStyle("-fx-font-family"+/*fontChoice.getTypeSelector()*/"miracode"+";");
+        mainCodeArea.setStyle("@font-face {font-family:idfc; src:url("+font +") }" +
+                "-fx-font-family:idfc;" +
+                "-fx-font-size: " + fontsize + ";");
         mainCodeArea.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -315,15 +314,24 @@ public class main extends Application {
             }
         });
 
+        final Pattern whiteSpace = Pattern.compile("\\B\\s+");
+        mainCodeArea.addEventHandler(KeyEvent.KEY_PRESSED, KE ->
+        {
+            if (KE.getCode() == KeyCode.ENTER) {
+                int caretPosition = mainCodeArea.getCaretPosition();
+                int currentParagraph = mainCodeArea.getCurrentParagraph();
+                Matcher m0 = whiteSpace.matcher(mainCodeArea.getParagraph(currentParagraph - 1).getSegments().get(0));
+                if (m0.find()) Platform.runLater(() -> mainCodeArea.insertText(caretPosition, m0.group()));
+            }
+        });
+
+
         mainCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(mainCodeArea));
-        if (iC.get()==true) {
+        if (iC.get() == true) {
             mainCodeArea.replaceText(textAreaText);
         } else {
             mainCodeArea.replaceText("");
         }
-        terminal = new TextArea(terminalText);
-        terminal.getStyleClass().add("terminalTextArea");
-        terminal.setEditable(false);
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(mainCodeArea);
         scrollPane.setFitToHeight(true);
@@ -352,23 +360,6 @@ public class main extends Application {
         return null;
     }
 
-    private static Node createChoiceBox() {
-        langChoice = new ChoiceBox();
-        langChoice.getItems().addAll("English", "Deutsch", "Esp\u00f1ol", "Lingua latina", "Nederlands");
-        langChoice.getStyleClass().add("settingsChoiceBox");
-        langChoice.setValue("English");
-        themeChoice = new ChoiceBox();
-        for(int i = 0; i < listOfThemes.length; i++){
-            themeChoice.getItems().add(listOfThemes[i].getName());
-        }
-        themeChoice.getItems().add("add new theme");
-        fontChoice = new ChoiceBox();
-        for(int i = 0; i > listOfThemes.length; i++){
-            fontChoice.getItems().add(listOfFonts[i].getName());
-        }
-        fontChoice.getItems().add("add new Font");
-        return langChoice;
-    }
 
     private void SaveFile(String content, File file) {
         try {
