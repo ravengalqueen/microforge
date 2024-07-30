@@ -47,7 +47,7 @@ public class main extends Application {
 
     private String name = "Microforge";
     private String fileMenuName = "File";
-    private String version = "preAlpha 0.0.1";
+    private String version = "preAlpha 0.0.1b";
     private String newFileButtonString = "Ignore";
     private String newSaveString = "Save";
     private String newReturnButtons = "Return";
@@ -251,10 +251,10 @@ public class main extends Application {
 
     public void preferencesFx() {
         ObservableList fontItems = FXCollections.observableArrayList(Arrays.asList(listOfFonts));
-        ObjectProperty font = new SimpleObjectProperty<>(listOfFonts[0]);
+        ObjectProperty font = new SimpleObjectProperty<>();
 
         themeItems = FXCollections.observableArrayList(Arrays.asList(listOfThemes));
-        ObjectProperty theme = new SimpleObjectProperty<>(listOfThemes[0]);
+        ObjectProperty theme = new SimpleObjectProperty<>();
         PreferencesFx preferencesFx =
                 PreferencesFx.of(main.class,
                         Category.of("Main",
